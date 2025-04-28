@@ -3,14 +3,12 @@ package com.example.cereberus.ui.vault;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 
+import com.example.cereberus.ui.util.InsetsUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.example.cereberus.R;
@@ -29,11 +27,7 @@ public class VaultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vault);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.recyclerViewPasswords), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(0, systemBars.top, 0, 0);  // top padding = status bar height
-            return insets;
-        });
+        InsetsUtil.applyTopInsets(findViewById(R.id.recyclerViewPasswords));
 
         recyclerView = findViewById(R.id.recyclerViewPasswords);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

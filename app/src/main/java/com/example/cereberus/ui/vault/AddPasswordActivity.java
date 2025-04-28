@@ -4,11 +4,9 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.cereberus.R;
+import com.example.cereberus.ui.util.InsetsUtil;
 
 public class AddPasswordActivity extends AppCompatActivity {
 
@@ -22,11 +20,7 @@ public class AddPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_password);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootView), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(0, systemBars.top, 0, 0);
-            return insets;
-        });
+        InsetsUtil.applyTopInsets(findViewById(R.id.rootView));
 
         editTextService = findViewById(R.id.editTextService);
         editTextUsername = findViewById(R.id.editTextUsername);
