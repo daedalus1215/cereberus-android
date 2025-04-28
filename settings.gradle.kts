@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "chronus-android"
+rootProject.name = "cereberus"
 include(":app")
  

@@ -1,4 +1,4 @@
-package com.example.chronus_android
+package com.example.cereberus
 
 import org.junit.Test
 
