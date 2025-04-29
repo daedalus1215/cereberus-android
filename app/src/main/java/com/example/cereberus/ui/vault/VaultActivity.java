@@ -6,6 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.result.ActivityResult;
+import androidx.annotation.Nullable;
+
+
 import android.content.Intent;
 
 import com.example.cereberus.ui.util.InsetsUtil;
@@ -19,6 +25,7 @@ import java.util.List;
 
 public class VaultActivity extends AppCompatActivity {
     private static final int ADD_PASSWORD_REQUEST = 1;
+    private ActivityResultLauncher<Intent> addPasswordLauncher;
 
     private RecyclerView recyclerView;
     private PasswordAdapter adapter;
@@ -44,10 +51,27 @@ public class VaultActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
 
+        addPasswordLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Intent data = result.getData();
+                        String service = data.getStringExtra("service");
+                        String username = data.getStringExtra("username");
+                        String password = data.getStringExtra("password");
+                        String notes = data.getStringExtra("notes");
+
+                        PasswordEntry newEntry = new PasswordEntry(service, username, password, notes);
+                        passwordList.add(newEntry);
+                        adapter.notifyItemInserted(passwordList.size() - 1);
+                    }
+                }
+        );
+
         FloatingActionButton fabAddPassword = findViewById(R.id.fabAddPassword);
         fabAddPassword.setOnClickListener(v -> {
             Intent intent = new Intent(VaultActivity.this, AddPasswordActivity.class);
-            startActivityForResult(intent, ADD_PASSWORD_REQUEST);
+            addPasswordLauncher.launch(intent);
         });
 
     }
