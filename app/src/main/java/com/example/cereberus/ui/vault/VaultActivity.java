@@ -17,6 +17,7 @@ import com.example.cereberus.data.model.PasswordEntry;
 import java.util.List;
 
 public class VaultActivity extends AppCompatActivity {
+    private static final int ADD_PASSWORD_REQUEST = 1;
 
     private RecyclerView recyclerView;
     private PasswordAdapter adapter;
@@ -41,7 +42,24 @@ public class VaultActivity extends AppCompatActivity {
         FloatingActionButton fabAddPassword = findViewById(R.id.fabAddPassword);
         fabAddPassword.setOnClickListener(v -> {
             Intent intent = new Intent(VaultActivity.this, AddPasswordActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, ADD_PASSWORD_REQUEST);
         });
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_PASSWORD_REQUEST && resultCode == RESULT_OK) {
+            String service = data.getStringExtra("service");
+            String username = data.getStringExtra("username");
+            String password = data.getStringExtra("password");
+            String notes = data.getStringExtra("notes");
+
+            PasswordEntry newEntry = new PasswordEntry(service, username, password, notes);
+            passwordList.add(newEntry);
+            adapter.notifyItemInserted(passwordList.size() - 1);
+        }
+    }
+
 }
