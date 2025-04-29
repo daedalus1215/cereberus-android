@@ -40,7 +40,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -54,6 +53,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
     testImplementation(libs.junit)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("com.google.code.gson:gson:2.10.1")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

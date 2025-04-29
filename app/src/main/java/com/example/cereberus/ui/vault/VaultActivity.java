@@ -1,32 +1,29 @@
 package com.example.cereberus.ui.vault;
 
 import android.os.Bundle;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.activity.result.ActivityResult;
-import androidx.annotation.Nullable;
-
-
-import android.content.Intent;
-
-import com.example.cereberus.ui.util.InsetsUtil;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.example.cereberus.R;
 import com.example.cereberus.data.model.PasswordEntry;
+import com.example.cereberus.data.storage.SecureStorage;
+import com.example.cereberus.ui.util.InsetsUtil;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VaultActivity extends AppCompatActivity {
-    private static final int ADD_PASSWORD_REQUEST = 1;
-    private ActivityResultLauncher<Intent> addPasswordLauncher;
 
+    private ActivityResultLauncher<Intent> addPasswordLauncher;
+    private SecureStorage secureStorage;
     private RecyclerView recyclerView;
     private PasswordAdapter adapter;
     private ArrayList<PasswordEntry> passwordList;
@@ -38,19 +35,25 @@ public class VaultActivity extends AppCompatActivity {
 
         InsetsUtil.applyTopInsets(findViewById(R.id.recyclerViewPasswords));
 
+        try {
+            secureStorage = new SecureStorage(this);
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+            finish(); // or show an error to the user
+            return;
+        }
+
         recyclerView = findViewById(R.id.recyclerViewPasswords);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        passwordList = new ArrayList<>(List.of(
-                new PasswordEntry("Google", "user@gmail.com", "password123", ""),
-                new PasswordEntry("Reddit", "redditUser", "password456", ""),
-                new PasswordEntry("Bank", "bankUser", "securepass", "")
-        ));
+        // Load existing passwords
+        List<PasswordEntry> loadedPasswords = secureStorage.loadPasswords();
+        passwordList = new ArrayList<>(loadedPasswords); // make mutable copy
 
         adapter = new PasswordAdapter(passwordList);
         recyclerView.setAdapter(adapter);
 
-
+        // Register the launcher for adding passwords
         addPasswordLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -64,6 +67,9 @@ public class VaultActivity extends AppCompatActivity {
                         PasswordEntry newEntry = new PasswordEntry(service, username, password, notes);
                         passwordList.add(newEntry);
                         adapter.notifyItemInserted(passwordList.size() - 1);
+
+                        // Save updated list
+                        secureStorage.savePasswords(passwordList);
                     }
                 }
         );
@@ -73,22 +79,5 @@ public class VaultActivity extends AppCompatActivity {
             Intent intent = new Intent(VaultActivity.this, AddPasswordActivity.class);
             addPasswordLauncher.launch(intent);
         });
-
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_PASSWORD_REQUEST && resultCode == RESULT_OK) {
-            String service = data.getStringExtra("service");
-            String username = data.getStringExtra("username");
-            String password = data.getStringExtra("password");
-            String notes = data.getStringExtra("notes");
-
-            PasswordEntry newEntry = new PasswordEntry(service, username, password, notes);
-            passwordList.add(newEntry);
-            adapter.notifyItemInserted(passwordList.size() - 1);
-        }
-    }
-
 }
